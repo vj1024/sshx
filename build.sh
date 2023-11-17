@@ -3,7 +3,7 @@
 cd "$(dirname $0)"
 dir="$(pwd)"
 name=$(basename "$dir")
-tag=$(git rev-parse --short HEAD 2>/dev/null)
+tag=$(git describe --abbrev=0 --tags)
 gover=$(go env GOVERSION)
 
 set -e

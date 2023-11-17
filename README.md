@@ -1,6 +1,6 @@
 # sshx
 
-sshx is a convenient ssh tool, auto send passwords or execute commands like expect, effectively keep connections alive by simulating inputs, quickly log in by aliases.
+sshx is a convenient ssh tool, auto send passwords or execute commands like 'expect', effectively keep connections alive by simulating inputs, quickly log in by aliases.
 
 ## Installation
 
@@ -19,8 +19,8 @@ sshx localhost
 ## Configuration
 
 Configuration file is optional.
-The default file location is ~/.ssh/sshx.yaml.
-It can also be modified through the environment variable 'SSHX_CONFIG' or the command line option '-c'.
+The default file location is `~/.ssh/sshx.yaml`.
+It can also be modified through the environment variable `SSHX_CONFIG` or the command line option `-c`.
 
 ``` yaml
 servers:
