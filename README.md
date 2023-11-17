@@ -1,6 +1,6 @@
 # sshx
 
-ssh is a convenient ssh tool, auto send passwords or execute commands like expect, effectively keep connections alive by simulating inputs, quickly log in by aliases.
+sshx is a convenient ssh tool, auto send passwords or execute commands like expect, effectively keep connections alive by simulating inputs, quickly log in by aliases.
 
 ## Installation
 
