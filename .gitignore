@@ -1,0 +1,7 @@
+.idea
+.vscode
+.VSCodeCounter
+.DS_Store
+compress/
+go.sum
+sshx
