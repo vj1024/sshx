@@ -17,7 +17,7 @@ function build() {
 
     version="${tag}-${gover}-${os}-${arch}"
     echo "build $version"
-    GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -ldflags "-X 'main.VERSION=$version'" -o "$name"
+    GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -ldflags "-X 'main.Version=$version'" -o "$name"
 
     if [[ "$compress" == "true" ]]; then
         mkdir -p compress
