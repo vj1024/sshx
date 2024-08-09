@@ -24,6 +24,7 @@ type Server struct {
 	IdleMaxSeconds int             `yaml:"idle_max_seconds"`
 	IdleSendString string          `yaml:"idle_send_string"`
 	Expect         []*expectConfig `yaml:"expect"`
+	Options        []string        `yaml:"options"`
 
 	passwordSent bool
 	expectEnd    bool

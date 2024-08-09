@@ -105,7 +105,10 @@ func main() {
 
 func start(sv *Server) error {
 	// Create arbitrary command.
-	c := exec.Command("ssh", "-p", fmt.Sprint(sv.Port), fmt.Sprintf("%s@%s", sv.User, sv.Host))
+	var args []string
+	args = append(args, sv.Options...)
+	args = append(args, "-p", fmt.Sprint(sv.Port), fmt.Sprintf("%s@%s", sv.User, sv.Host))
+	c := exec.Command("ssh", args...)
 	c.Env = os.Environ()
 
 	// Start the command with a pty.
