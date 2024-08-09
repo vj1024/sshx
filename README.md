@@ -26,15 +26,15 @@ It can also be modified through the environment variable `SSHX_CONFIG` or the co
 servers:
 
 - alias: [ test ]
-  host: localhost 
+  host: localhost
   port: 22
   user: test_user
   password: 'test_password'
 
 - alias: [ test1, user1 ]
-  host: localhost 
+  host: localhost
   port: 2222
-  user: root 
+  user: root
   expect:
   - match: '(P|p)assword:' # regular expression
     send: 'root_password'
@@ -43,6 +43,9 @@ servers:
     end: true
   idle_max_seconds: 600
   idle_send_string: '@'
+  options:
+    - -i
+    - /private/id_rsa
 ```
 
 ## License
