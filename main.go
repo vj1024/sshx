@@ -20,7 +20,7 @@ import (
 var Version = "unknown"
 
 type options struct {
-	Port           uint          `short:"p" long:"port" description:"Show verbose debug information"`
+	Port           uint          `short:"p" long:"port" default:"22" description:"Show verbose debug information"`
 	Log            string        `short:"l" long:"log" description:"The file to write error logs, default to stderr"`
 	Config         string        `short:"c" long:"config" description:"The config file to load, in yaml format. If not specified, the file path is read from the environment variable 'SSHX_CONFIG' or else '~/.ssh/sshx.yaml'"`
 	IdleMaxTime    time.Duration `short:"i" long:"idle-time" description:"The max idle time, when reaching this time, send the idle string to shell automatically"`
