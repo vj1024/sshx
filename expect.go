@@ -15,6 +15,7 @@ type expectWriter struct {
 	receive io.Writer
 	send    io.Writer
 	server  *Server
+	values  map[string]string
 }
 
 func (r *expectWriter) Write(b []byte) (n int, err error) {
@@ -46,7 +47,7 @@ func (r *expectWriter) Write(b []byte) (n int, err error) {
 	for _, v := range r.server.Expect {
 		if v.sendTimes < v.SendMaxTimes && v.match != nil && v.match.Match(b) {
 			//log.Printf("expect `%s`, send: `%s`, end: %v", v.Match, v.Send, v.End)
-			r.send.Write([]byte(v.Send + "\n"))
+			r.send.Write([]byte(sendValue(v.Send, r.values) + "\n"))
 			v.sendTimes++
 			if v.End {
 				r.server.expectEnd = true
@@ -55,6 +56,13 @@ func (r *expectWriter) Write(b []byte) (n int, err error) {
 		}
 	}
 	return
+}
+
+func sendValue(send string, values map[string]string) string {
+	for k, v := range values {
+		send = strings.ReplaceAll(send, "{{"+k+"}}", v)
+	}
+	return send
 }
 
 func isPasswordPrompt(b []byte) bool {

@@ -20,13 +20,14 @@ import (
 var Version = "unknown"
 
 type options struct {
-	Port           uint          `short:"p" long:"port" default:"22" description:"Show verbose debug information"`
-	Log            string        `short:"l" long:"log" description:"The file to write error logs, default to stderr"`
-	Config         string        `short:"c" long:"config" description:"The config file to load, in yaml format. If not specified, the file path is read from the environment variable 'SSHX_CONFIG' or else '~/.ssh/sshx.yaml'"`
-	IdleMaxTime    time.Duration `short:"i" long:"idle-time" description:"The max idle time, when reaching this time, send the idle string to shell automatically"`
-	IdleSendString string        `short:"s" long:"idle-string" description:"The string to send when shell is idle"`
-	PrintAlias     bool          `short:"a" long:"alias" description:"Print all aliases"`
-	PrintVersion   bool          `short:"v" long:"version" description:"Print version"`
+	Port           uint              `short:"p" long:"port" default:"0" description:"SSH server port, default: 22"`
+	Log            string            `short:"l" long:"log" description:"The file to write error logs, default to stderr"`
+	Config         string            `short:"c" long:"config" description:"The config file to load, in yaml format. If not specified, the file path is read from the environment variable 'SSHX_CONFIG' or else '~/.ssh/sshx.yaml'"`
+	IdleMaxTime    time.Duration     `short:"i" long:"idle-time" description:"The max idle time, when reaching this time, send the idle string to shell automatically"`
+	IdleSendString string            `short:"s" long:"idle-string" description:"The string to send when shell is idle"`
+	PrintAlias     bool              `short:"a" long:"alias" description:"Print all aliases"`
+	PrintVersion   bool              `short:"v" long:"version" description:"Display the version number and exit."`
+	Values         map[string]string `long:"value" description:"Set variable value, example: --value key:val"`
 }
 
 func main() {
@@ -97,6 +98,16 @@ func main() {
 	if opt.Port > 0 {
 		sv.Port = opt.Port
 	}
+	if sv.Port == 0 {
+		sv.Port = 22
+	}
+
+	if sv.values == nil {
+		sv.values = make(map[string]string)
+	}
+	for k, v := range opt.Values {
+		sv.values[k] = v
+	}
 
 	if err := start(sv); err != nil {
 		log.Fatal(err)
@@ -110,6 +121,8 @@ func start(sv *Server) error {
 	args = append(args, "-p", fmt.Sprint(sv.Port), fmt.Sprintf("%s@%s", sv.User, sv.Host))
 	c := exec.Command("ssh", args...)
 	c.Env = os.Environ()
+
+	fmt.Println(c.String())
 
 	// Start the command with a pty.
 	ptmx, err := pty.Start(c)
@@ -187,6 +200,7 @@ func start(sv *Server) error {
 		receive: w,
 		send:    ptmx,
 		server:  sv,
+		values:  sv.values,
 	}
 	_, _ = io.Copy(w, ptmx)
 

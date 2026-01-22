@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 
@@ -16,18 +18,27 @@ type Config struct {
 
 // Server is the ssh sever config.
 type Server struct {
-	Alias          []string        `yaml:"alias"`
-	Host           string          `yaml:"host"`
-	Port           uint            `yaml:"port"`
-	User           string          `yaml:"user"`
-	Password       string          `yaml:"password"`
-	IdleMaxSeconds int             `yaml:"idle_max_seconds"`
-	IdleSendString string          `yaml:"idle_send_string"`
-	Expect         []*expectConfig `yaml:"expect"`
-	Options        []string        `yaml:"options"`
+	Alias          []string               `yaml:"alias"`
+	Host           string                 `yaml:"host"`
+	Port           uint                   `yaml:"port"`
+	User           string                 `yaml:"user"`
+	Password       string                 `yaml:"password"`
+	IdleMaxSeconds int                    `yaml:"idle_max_seconds"`
+	IdleSendString string                 `yaml:"idle_send_string"`
+	Expect         []*expectConfig        `yaml:"expect"`
+	Options        []string               `yaml:"options"`
+	Values         map[string]valueConfig `yaml:"values"`
 
 	passwordSent bool
 	expectEnd    bool
+
+	values map[string]string `yaml:"values"`
+}
+
+type valueConfig struct {
+	From    string   `yaml:"from"`
+	Value   string   `yaml:"value"`
+	Command []string `yaml:"command"`
 }
 
 type expectConfig struct {
@@ -83,6 +94,11 @@ func loadConfig(path string) (*Config, error) {
 				ex.SendMaxTimes = 1
 			}
 		}
+
+		v.values = make(map[string]string)
+		for k, valConf := range v.Values {
+			v.values[k] = valConf.getValue()
+		}
 	}
 
 	return c, nil
@@ -127,5 +143,27 @@ func (c *Config) printAliases() {
 		fmt.Println("no alias configured")
 	} else {
 		fmt.Println(strings.Join(a, "\n"))
+	}
+}
+
+func (val *valueConfig) getValue() string {
+	switch val.From {
+	case "command":
+		if len(val.Command) == 0 {
+			log.Fatal("can not get value from empty command")
+		}
+		cmd := exec.Command(val.Command[0], val.Command[1:]...)
+		out, err := cmd.Output()
+		if err != nil {
+			log.Fatalf("get value from command: %v, err: %v", val.Command, err)
+		}
+		return strings.TrimSpace(string(out))
+
+	case "value", "":
+		return val.Value
+
+	default:
+		log.Fatalf("get value from unknown type: %s", val.From)
+		return ""
 	}
 }
